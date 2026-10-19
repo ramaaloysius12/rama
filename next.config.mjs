@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone', // <--- Tambahkan baris ini
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -8,14 +9,8 @@ const nextConfig = {
   },
   images: {
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**.supabase.co', // Ini wajib agar gambar Supabase tidak diblokir
-      },
-      {
-        protocol: 'https',
-        hostname: '**', // (Opsional) Mengizinkan gambar dari URL luar mana pun
-      }
+      { protocol: 'https', hostname: '**.supabase.co' },
+      { protocol: 'https', hostname: '**' }
     ],
   },
 };
