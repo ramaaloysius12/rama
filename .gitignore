@@ -34,3 +34,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Mengabaikan file rahasia environment variables
+.env
+.env.local
+.env.*
