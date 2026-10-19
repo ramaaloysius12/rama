@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum AdminRole {
+  SUPERADMIN
+  EDITOR
+}
+
+enum ArticleStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum CommentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Admin {
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  passwordHash String
+  role         AdminRole @default(SUPERADMIN)
+  articles     Article[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([email])
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?   @db.Text
+  articles    Article[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([slug])
+}
+
+model Article {
+  id               String        @id @default(cuid())
+  title            String
+  slug             String        @unique
+  excerpt          String        @db.Text
+  content          String        @db.Text
+  thumbnailUrl     String?
+  thumbnailPath    String?
+  imageAlt         String?
+  additionalImages String[]      @default([])
+  status           ArticleStatus @default(DRAFT)
+  isFeatured       Boolean       @default(false)
+  authorName       String
+  seoTitle         String?
+  seoDescription   String?       @db.Text
+  viewCount        Int           @default(0)
+  publishedAt      DateTime?
+  categoryId       String
+  category         Category      @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  authorId         String
+  author           Admin         @relation(fields: [authorId], references: [id], onDelete: Restrict)
+  comments         Comment[]
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  @@index([slug])
+  @@index([status])
+  @@index([publishedAt])
+  @@index([categoryId])
+  @@index([isFeatured])
+  @@index([status, publishedAt(sort: Desc)])
+}
+
+model Comment {
+  id         String        @id @default(cuid())
+  authorName String
+  content    String        @db.Text
+  status     CommentStatus @default(PENDING)
+  ipHash     String?
+  articleId  String
+  article    Article       @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  @@index([articleId, status, createdAt(sort: Desc)])
+  @@index([status])
+}
+
+model SiteSetting {
+  id           String   @id @default("default")
+  siteName     String   @default("Islam Kaffah")
+  tagline      String   @default("Portal Berita, Dakwah, Kajian, dan Artikel Keislaman")
+  description  String   @db.Text
+  contactEmail String   @default("redaksi@islamkaffah.id")
+  contactPhone String   @default("+62 812-3456-7890")
+  address      String   @default("Jakarta, Indonesia")
+  facebookUrl  String?
+  instagramUrl String?
+  youtubeUrl   String?
+  twitterUrl   String?
+  updatedAt    DateTime @updatedAt
+}
+
+model RateLimitLog {
+  id         String   @id @default(cuid())
+  identifier String
+  action     String
+  createdAt  DateTime @default(now())
+
+  @@index([identifier, action, createdAt])
+}
