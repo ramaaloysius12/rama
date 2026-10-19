@@ -1,12 +1,22 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
-    // Mengabaikan error ESLint (seperti tanda kutip) saat build di Vercel
     ignoreDuringBuilds: true,
   },
   typescript: {
-    // Mengabaikan error tipe data TypeScript saat build di Vercel
     ignoreBuildErrors: true,
+  },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**.supabase.co', // Ini wajib agar gambar Supabase tidak diblokir
+      },
+      {
+        protocol: 'https',
+        hostname: '**', // (Opsional) Mengizinkan gambar dari URL luar mana pun
+      }
+    ],
   },
 };
 
