@@ -1,0 +1,21 @@
+services:
+  web:
+    build: .
+    image: islam-kaffah-app
+    container_name: nextjs_web
+    ports:
+      - "8080:3000" # <-- Ini yang diubah agar tidak tabrakan
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus_server
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    restart: unless-stopped
+    depends_on:
+      - web
